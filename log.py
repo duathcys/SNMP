@@ -9,6 +9,7 @@ import sys
 import traceback as tr
 
 
+
 def get_logger(name=None):
     # 1 logger instance를 만듭니다.
     logger = logging.getLogger(name)
@@ -58,7 +59,6 @@ def get_logger(name=None):
 
     # 8 설정된 log setting을 반환합니다.
     return logger
-
 
 def catchException(logger, script_name, max_seq, startTime, typ, value, traceback):
     logger.error(f"Script: {script_name}")

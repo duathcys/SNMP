@@ -1,6 +1,6 @@
 from pysnmp.hlapi import *
 
-from log import get_logger
+from Log import get_logger
 
 logger = get_logger('GET')
 
@@ -14,9 +14,9 @@ def GetState(iterator, Col):
         else:
             if errorStatus:  # SNMP agent errors
                 print('%s at %s' % (errorStatus.prettyPrint(),
-                                varBinds[int(errorIndex) - 1] if errorIndex else '?'))
+                                    varBinds[int(errorIndex) - 1] if errorIndex else '?'))
                 Col.append('%s at %s' % (errorStatus.prettyPrint(),
-                                varBinds[int(errorIndex) - 1] if errorIndex else '?'))
+                                         varBinds[int(errorIndex) - 1] if errorIndex else '?'))
             else:
                 for varBind in varBinds:  # SNMP response contents
                     print('='.join([x.prettyPrint() for x in varBind]))

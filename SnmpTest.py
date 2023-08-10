@@ -1,11 +1,12 @@
 from pysnmp.hlapi import *
 
 from Convert import ExcelToCSV
-from GET import GetState
-from GETSUB import GetSubState
+from Get import GetState
+from Getsub import GetSubState
 from Toexcel import ExcelOut
-from log import get_logger
-from validation import checkIP
+from Log import get_logger
+from Validation import checkIP
+from Message import getMessage
 
 logger = get_logger('MAIN')
 
@@ -16,15 +17,15 @@ HOST = data['IP주소']
 PORT = 161
 COMMUNITY = data['커뮤니티명']
 OID = data['OID']
-TYPE  = data['SNMP 타입']
+TYPE = data['SNMP 타입']
 HOST_list = HOST.values.tolist()
 COMMUNITY_list = COMMUNITY.values.tolist()
 NAME_list = NAME.values.tolist()
 OID_list = OID.values.tolist()
 TYPE_list = TYPE.values.tolist()
 
-Message=[]
-Getsub=[]
+Message = []
+Getsub = []
 
 SIZE = len(HOST_list)
 print(SIZE)
@@ -39,11 +40,14 @@ result_data = {
 }
 
 for i in range(SIZE):
-    if TYPE_list[i]=='GET':
+    if TYPE_list[i] == 'GET':
         if (HOST_list[i] != '') & (checkIP(HOST_list[i]) == True) & (COMMUNITY_list[i] != ''):
             engine = SnmpEngine()
             host = UdpTransportTarget((HOST_list[i], PORT))
             community = CommunityData(COMMUNITY_list[i], mpModel=1)
+            if OID_list[i] == "":
+                print('No OID')
+                Message.append('OID 없음')
             identity_obj_list = [
                 ObjectType(ObjectIdentity(OID_list[i]))
             ]
@@ -51,45 +55,23 @@ for i in range(SIZE):
                 iterator = getCmd(engine, community, host, ContextData(), identity_obj)
                 GetState(iterator, Message)
         else:
-            if HOST_list[i] == '' or COMMUNITY_list[i] == '':
-                if HOST_list[i] == '' and COMMUNITY_list[i] != '':
-                    print('No IP')
-                    Message.append('IP 주소 없음')
-                elif HOST_list[i] != '' and COMMUNITY_list[i] == '':
-                    print('No Community')
-                    Message.append('커뮤니티명 없음')
-                else:
-                    print('No IP & Community')
-                    Message.append('IP 주소와 커뮤니티명 모두 없음')
-            elif checkIP(HOST_list[i]) == False:
-                print('Not available IP')
-                Message.append('IP 주소 올바르지 않음')
+            getMessage(HOST_list[i], COMMUNITY_list[i], Message)
 
-    elif TYPE_list[i]=='GETSUBTREE':
+    elif TYPE_list[i] == 'GETSUBTREE':
         if (HOST_list[i] != '') & (checkIP(HOST_list[i]) == True) & (COMMUNITY_list[i] != ''):
             Getsub = []
             engine = SnmpEngine()
             host = UdpTransportTarget((HOST_list[i], PORT))
             community = CommunityData(COMMUNITY_list[i], mpModel=1)
+            if OID_list[i] == "":
+                print('No OID')
+                Message.append('OID 없음')
             GetSubState(engine, community, host, OID_list[i], Message, Getsub)
             if len(Message) <= i:
                 print('No Information')
                 Message.append('정보 없음')
-
         else:
-            if HOST_list[i] == '' or COMMUNITY_list[i] == '':
-                if HOST_list[i] == '' and COMMUNITY_list[i] != '':
-                    print('No IP')
-                    Message.append('IP 주소 없음')
-                elif HOST_list[i] != '' and COMMUNITY_list[i] == '':
-                    print('No Community')
-                    Message.append('커뮤니티명 없음')
-                else:
-                    print('No IP & Community')
-                    Message.append('IP 주소와 커뮤니티명 모두 없음')
-            elif checkIP(HOST_list[i]) == False:
-                print('Not available IP')
-                Message.append('IP 주소 올바르지 않음')
+            getMessage(HOST_list[i], COMMUNITY_list[i], Message)
     else:
         if TYPE_list[i] == '':
             print('No SNMP Type')
