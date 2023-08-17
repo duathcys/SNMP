@@ -1,16 +1,16 @@
 from pysnmp.hlapi import *
 
-from Convert import ExcelToCSV
-from Get import GetState
-from Getsub import GetSubState
-from Toexcel import ExcelOut
+from Convert import excel_to_csv
+from Get import get_state
+from Getsub import getsub_state
+from Toexcel import excel_export
 from Log import get_logger
-from Validation import checkIP
-from Message import getMessage
+from Validation import check_ip
+from Message import get_message
 
 logger = get_logger('MAIN')
 
-data = ExcelToCSV()
+data = excel_to_csv()
 data = data.fillna('')
 NAME = data['장비명']
 HOST = data['IP주소']
@@ -41,7 +41,7 @@ result_data = {
 
 for i in range(SIZE):
     if TYPE_list[i] == 'GET':
-        if (HOST_list[i] != '') & (checkIP(HOST_list[i]) == True) & (COMMUNITY_list[i] != ''):
+        if (HOST_list[i] != '') & (check_ip(HOST_list[i]) == True) & (COMMUNITY_list[i] != ''):
             engine = SnmpEngine()
             host = UdpTransportTarget((HOST_list[i], PORT))
             community = CommunityData(COMMUNITY_list[i], mpModel=1)
@@ -53,12 +53,12 @@ for i in range(SIZE):
             ]
             for identity_obj in identity_obj_list:
                 iterator = getCmd(engine, community, host, ContextData(), identity_obj)
-                GetState(iterator, Message)
+                get_state(iterator, Message)
         else:
-            getMessage(HOST_list[i], COMMUNITY_list[i], Message)
+            get_message(HOST_list[i], COMMUNITY_list[i], Message)
 
     elif TYPE_list[i] == 'GETSUBTREE':
-        if (HOST_list[i] != '') & (checkIP(HOST_list[i]) == True) & (COMMUNITY_list[i] != ''):
+        if (HOST_list[i] != '') & (check_ip(HOST_list[i]) == True) & (COMMUNITY_list[i] != ''):
             Getsub = []
             engine = SnmpEngine()
             host = UdpTransportTarget((HOST_list[i], PORT))
@@ -66,12 +66,12 @@ for i in range(SIZE):
             if OID_list[i] == "":
                 print('No OID')
                 Message.append('OID 없음')
-            GetSubState(engine, community, host, OID_list[i], Message, Getsub)
+            getsub_state(engine, community, host, OID_list[i], Message, Getsub)
             if len(Message) <= i:
                 print('No Information')
                 Message.append('정보 없음')
         else:
-            getMessage(HOST_list[i], COMMUNITY_list[i], Message)
+            get_message(HOST_list[i], COMMUNITY_list[i], Message)
     else:
         if TYPE_list[i] == '':
             print('No SNMP Type')
@@ -80,4 +80,4 @@ for i in range(SIZE):
             print('Wrong SNMP Type')
             Message.append('잘못된 SNMP Type임')
 
-ExcelOut(result_data)
+excel_export(result_data)
