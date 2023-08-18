@@ -5,7 +5,7 @@ from Log import get_logger
 logger = get_logger('GETSUB')
 
 
-def GetSubState(engine, community, host, oid, Col, Col2):
+def getsub_state(engine, community, host, oid, Col, Col2):
     try:
         for (errorIndication,
              errorStatus,

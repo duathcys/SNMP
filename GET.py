@@ -5,7 +5,7 @@ from Log import get_logger
 logger = get_logger('GET')
 
 
-def GetState(iterator, Col):
+def get_state(iterator, Col):
     try:
         errorIndication, errorStatus, errorIndex, varBinds = next(iterator)
         if errorIndication:  # SNMP engine errors

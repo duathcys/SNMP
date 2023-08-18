@@ -4,7 +4,7 @@ from Log import get_logger
 logger = get_logger('validation')
 
 
-def checkIP(value):
+def check_ip(value):
     try:
         try:
             ip = ipaddress.ip_address(value)
